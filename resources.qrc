@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>resources/icons/games_tetris.ico</file>
+        <file>resources/icons/games_tetris.icns</file>
+        <file>resources/icons/games_tetris.png</file>
+    </qresource>
+</RCC>
