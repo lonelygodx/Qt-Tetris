@@ -57,10 +57,7 @@ bool InputHandler::processKeyEvent(QKeyEvent* event)
 
             // 对于移动操作，启动自动重复
             if (action == ACTION_MOVE_LEFT || action == ACTION_MOVE_RIGHT) {
-                m_currentRepeatingAction = action;
-                m_autoRepeatTimer->setSingleShot(true);
-                m_autoRepeatTimer->start(m_config.autoRepeatDelay);
-                m_isRepeating = true;
+                startAutoRepeat(action);
             }
             // 软下落不启动自动重复，而是持续状态
             else if (action == ACTION_SOFT_DROP) {
@@ -104,6 +101,7 @@ void InputHandler::onAutoRepeat()
 void InputHandler::startAutoRepeat(GameAction action)
 {
     m_currentRepeatingAction = action;
+    m_autoRepeatTimer->setSingleShot(true);
     m_autoRepeatTimer->start(m_config.autoRepeatDelay);
     m_isRepeating = true;
 }

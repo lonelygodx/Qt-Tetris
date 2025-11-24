@@ -19,8 +19,6 @@ GameEngine::GameEngine(QObject* parent)
     m_gameTimer = new QTimer(this);
     connect(m_gameTimer, &QTimer::timeout, this, &GameEngine::updateGame);
     m_gameTimer->setInterval(16); // 约60FPS
-    // 初始化Hold方块为一个有效的空方块
-    m_holdBlock = Block(); // 这会创建一个TYPE_COUNT的方块，表示"无Hold方块"
 }
 
 GameEngine::~GameEngine()
@@ -34,6 +32,9 @@ bool GameEngine::initialize(int width, int height)
 {
     m_gameField = GameField(width, height);
     resetGameStats();
+
+    // 初始化Hold方块为一个有效的空方块
+    m_holdBlock = Block(); // 这会创建一个TYPE_COUNT的方块，表示"无Hold方块"
 
     // 初始化预览方块
     m_nextBlock = m_blockFactory->createRandomBlock();
@@ -58,6 +59,9 @@ void GameEngine::startGame()
     m_fastDrop = false;
     m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
 
+    // 清除holdblock
+    m_holdBlock = Block();
+
     // 生成第一个方块
     spawnNewBlock();
 
@@ -68,6 +72,7 @@ void GameEngine::startGame()
         qDebug() << "ERROR: Game timer is null!";
     }
 
+    emit holdBlockChanged();   // 更新holdblock状态
     emit gameStateChanged(m_gameState);
     emit gameFieldChanged();
 }
@@ -128,21 +133,22 @@ void GameEngine::updateGame()
     int currentFallSpeed = m_fastDrop ? m_fastFallSpeed : m_fallSpeed;
     float progressIncrement = static_cast<float>(deltaTime) / currentFallSpeed;
 
-    // 检查是否可以继续下落
-    if (isValidPosition(m_currentBlock, 0, 1)) {
-        // 可以下落，更新进度
-        m_fallProgress += progressIncrement;
+    // 更新进度
+    m_fallProgress += progressIncrement;
 
-        // 如果进度达到1，执行实际下落
-        if (m_fallProgress >= 1.0f) {
+    // 如果进度达到1，达到下落时机
+    if (m_fallProgress >= 1.0f) {
+        // 检查是否可以继续下落
+        if (isValidPosition(m_currentBlock, 0, 1)) {
+            // 执行实际下落
             m_currentBlock.move(0, 1);
             m_fallProgress = 0.0f;
             emit currentBlockChanged();
+        } else {
+            // 不能下落，立即锁定方块
+            m_fallProgress = 0.0f; // 重置进度
+            lockCurrentBlock();
         }
-    } else {
-        // 不能下落，立即锁定方块
-        m_fallProgress = 0.0f; // 重置进度
-        lockCurrentBlock();
     }
 }
 
@@ -400,7 +406,7 @@ void GameEngine::lockCurrentBlock()
     placeCurrentBlock();
 
     // 清除完整的行
-    int linesCleared = clearCompletedLines();
+    clearCompletedLines();
 
     // 生成新方块
     spawnNewBlock();
@@ -412,14 +418,14 @@ void GameEngine::lockCurrentBlock()
 
 int GameEngine::clearCompletedLines()
 {
-    m_gameField.debugPrintField(); // 打印消除前的场地状态
+    // m_gameField.debugPrintField(); // 打印消除前的场地状态
 
     QVector<int> completeLines = m_gameField.findCompleteLines();
 
     int linesCleared = completeLines.size();
     if (linesCleared > 0) {
         m_gameField.removeLines(completeLines);
-        m_gameField.debugPrintField(); // 打印消除后的场地状态
+        // m_gameField.debugPrintField(); // 打印消除后的场地状态
 
         updateGameStats(linesCleared);
         emit gameFieldChanged();

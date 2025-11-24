@@ -18,11 +18,8 @@ void GameWidget::setGameEngine(GameEngine* engine)
     m_engine = engine;
 
     if (m_engine) {
-
-        bool connected = connect(m_engine, &GameEngine::gameFieldChanged,
-                                 this, QOverload<>::of(&QWidget::update));
-        connected = connect(m_engine, &GameEngine::currentBlockChanged,
-                            this, QOverload<>::of(&QWidget::update));
+        connect(m_engine, &GameEngine::gameFieldChanged, this, QOverload<>::of(&QWidget::update));
+        connect(m_engine, &GameEngine::currentBlockChanged, this, QOverload<>::of(&QWidget::update));
     } else {
         qDebug() << "ERROR: Game engine is null in setGameEngine";
     }
@@ -188,7 +185,7 @@ void GameWidget::drawCurrentBlock(QPainter& painter)
 
     for (const auto& cell : cells) {
         // 计算实际绘制位置（包括下落进度）
-        float actualY = cell.y + fallProgress;
+        float actualY = cell.y + static_cast<int>(trunc(fallProgress));  // 对下落进度取整，防止出现在某一格内的情况
         int drawY = actualY * cellSize;
 
         // 只绘制场地内的部分
@@ -632,7 +629,7 @@ void MainWindow::initializeSystems()
     m_gameEngine.reset(new GameEngine());
 
     // 初始化游戏引擎
-    bool initialized = m_gameEngine->initialize();
+    m_gameEngine->initialize();
 
     // 创建输入处理器
     m_inputHandler.reset(new InputHandler());

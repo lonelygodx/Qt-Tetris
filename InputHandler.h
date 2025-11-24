@@ -28,7 +28,7 @@ public:
         int autoRepeatDelay;    // 自动重复延迟(ms)
         int autoRepeatInterval; // 自动重复间隔(ms)
 
-        InputConfig() : autoRepeatDelay(200), autoRepeatInterval(50) {}
+        InputConfig() : autoRepeatDelay(150), autoRepeatInterval(50) {}
     };
 
     explicit InputHandler(QObject* parent = nullptr);
