@@ -23,9 +23,9 @@ public:
     };
     //方块结构体
     struct BlockShape {
-        QString name;
+        QString name; // 方块名
         QVector<QVector<bool>> pattern; // 4x4 矩阵
-        QColor color;
+        QColor color; // 方块颜色
         //生成时坐标
         int spawnOffsetX;
         int spawnOffsetY;
@@ -51,13 +51,13 @@ public:
     void setPosition(const Position& pos) { m_position = pos; }
     void setPosition(int x, int y) { m_position = Position{ x, y }; }
     void move(int dx, int dy);
-    void rotateClockwise();
-    void rotateCounterClockwise();
+    void rotateClockwise(); // 顺时针旋转
+    void rotateCounterClockwise();  // 逆时针
     void resetRotation();
 
     // 几何信息
-    QVector<Position> getOccupiedCells() const;
-    QRect getBoundingBox() const;
+    QVector<Position> getOccupiedCells() const;  // 获取各个方块的当前位置坐标
+    QRect getBoundingBox() const; // 获取图形边界坐标所在的矩形
 
 private:
     BlockType m_type;           // 类型
@@ -65,7 +65,7 @@ private:
     Position m_position;        // 位置
     RotationState m_rotation;   // 角度
 
-    QVector<QVector<bool>> getRotatedPattern() const;
+    QVector<QVector<bool>> getRotatedPattern() const;  // 方块的几何位置
 };
 
 #endif // BLOCK_H

@@ -41,6 +41,7 @@ void Block::resetRotation()
 
 QVector<Position> Block::getOccupiedCells() const
 {
+    // 将方块的几何位置转换为坐标
     QVector<Position> cells;
     QVector<QVector<bool>> pattern = getRotatedPattern();
 
@@ -67,7 +68,7 @@ QRect Block::getBoundingBox() const
     int minY = cells[0].y;
     int maxY = cells[0].y;
 
-    for (const Position& cell : cells) {
+    for (const Position& cell : std::as_const(cells)) {
         minX = std::min(minX, cell.x);
         maxX = std::max(maxX, cell.x);
         minY = std::min(minY, cell.y);

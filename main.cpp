@@ -1,4 +1,4 @@
-#include "TetrisGame.h"
+#include "MainWindow.h"
 #include <QApplication>
 #include <QFile>
 

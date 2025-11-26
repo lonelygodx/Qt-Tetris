@@ -1,5 +1,5 @@
-#ifndef TETRISGAME_H
-#define TETRISGAME_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QVBoxLayout>
@@ -7,66 +7,14 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QKeyEvent>
+#include <QWidget>
+
 #include "GameEngine.h"
 #include "InputHandler.h"
 #include "ScoreManager.h"
-#include <QWidget>
+#include "GameWidget.h"
 
 class GameEngine;
-
-class GameWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit GameWidget(QWidget* parent = nullptr);
-    void setGameEngine(GameEngine* engine);
-
-protected:
-    void paintEvent(QPaintEvent* event) override;
-
-private:
-    GameEngine* m_engine;
-
-    // 绘制方法
-    void drawGameField(QPainter& painter);
-    void drawGhostBlock(QPainter& painter);  // 新增：绘制幽灵方块
-    void drawCurrentBlock(QPainter& painter);
-};
-
-class NextBlockWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit NextBlockWidget(QWidget* parent = nullptr);
-    void setNextBlock(const Block& block);
-    void setCellSize(int size) { m_cellSize = size; }
-
-protected:
-    void paintEvent(QPaintEvent* event) override;
-
-private:
-    Block m_nextBlock;
-    int m_cellSize;
-};
-
-class HoldBlockWidget : public QWidget
-{
-    Q_OBJECT
-
-public:
-    explicit HoldBlockWidget(QWidget* parent = nullptr);
-    void setHoldBlock(const Block& block);
-    void setCellSize(int size) { m_cellSize = size; }
-
-protected:
-    void paintEvent(QPaintEvent* event) override;
-
-private:
-    Block m_holdBlock;
-    int m_cellSize;
-};
 
 class MainWindow : public QMainWindow
 {
@@ -82,12 +30,14 @@ protected:
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
-    //void onGameStateChanged(GameEngine::GameState newState, GameEngine::GameState oldState);
+    // 游戏状态事件
     void onGameStateChanged(GameEngine::GameState newState);
     void onGameStatsUpdated(const GameStats& stats);
+    // 游戏控制事件
     void startNewGame();
     void showHighScores();
     void showHelp();
+    // 游戏中事件
     void onNextBlockChanged();
     void onHoldBlockChanged();
 
@@ -104,7 +54,6 @@ private:
     // 创建右侧信息面板
     QWidget* createInfoPanel();
     void setupGameConnections();
-    void setupConnections();
     void setupBasicConnections();
     void initializeSystems();
     void handleGameOver();
@@ -141,4 +90,4 @@ private:
     QVBoxLayout* m_infoPanelLayout;  // 信息面板布局（垂直）
 };
 
-#endif // TETRISGAME_H
+#endif // MAINWINDOW_H

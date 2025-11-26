@@ -24,7 +24,7 @@ public:
     };
 
     struct InputConfig {
-        QHash<Qt::Key, GameAction> keyMapping;
+        QHash<Qt::Key, GameAction> keyMapping; // 按键映射
         int autoRepeatDelay;    // 自动重复延迟(ms)
         int autoRepeatInterval; // 自动重复间隔(ms)
 
@@ -39,28 +39,15 @@ public:
 
     // 输入处理
     bool processKeyEvent(QKeyEvent* event);
-    void setEnabled(bool enabled) { m_enabled = enabled; }
 
 signals:
-    void actionTriggered(GameAction action);
-    void actionRepeated(GameAction action);
-    void actionReleased(GameAction action);
-
-private slots:
-    void onAutoRepeat();
+    void actionTriggered(InputHandler::GameAction action);
+    void actionReleased(InputHandler::GameAction action);
 
 private:
     void initializeDefaultMapping();
-    void startAutoRepeat(GameAction action);
-    void stopAutoRepeat();
 
     InputConfig m_config;
-    bool m_enabled;
-
-    // 自动重复状态
-    QTimer* m_autoRepeatTimer;
-    GameAction m_currentRepeatingAction;
-    bool m_isRepeating;
 };
 
 #endif // INPUTHANDLER_H

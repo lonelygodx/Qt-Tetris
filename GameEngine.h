@@ -13,6 +13,7 @@ class GameEngine : public QObject
     Q_OBJECT
 
 public:
+    // 游戏运行状态
     enum GameState {
         STATE_STOPPED,
         STATE_RUNNING,
@@ -34,7 +35,6 @@ public:
     // 方块操作
     bool moveLeft();
     bool moveRight();
-    bool moveDown();
     bool rotateClockwise();
     bool rotateCounterClockwise();
     void softDrop();
@@ -63,7 +63,7 @@ public:
     bool isGhostBlockEnabled() const { return m_ghostEnabled; }
 
 signals:
-    void gameStateChanged(GameState newState);
+    void gameStateChanged(GameEngine::GameState newState);
     void gameStatsUpdated(const GameStats& stats);
     void gameFieldChanged();
     void currentBlockChanged();
@@ -75,17 +75,19 @@ private slots:
 
 private:
     // 游戏逻辑
-    void spawnNewBlock();
-    void placeCurrentBlock();
-    void lockCurrentBlock();
-    int clearCompletedLines();
-    void updateGameStats(int linesCleared);
-    void calculateScore(int linesCleared);
-    void updateLevel();
+    void extracted(bool &canSpawn, QVector<Position> &cells);
+    void spawnNewBlock();                   // 生成新方块
+    void placeCurrentBlock();               // 放置方块
+    void lockCurrentBlock();                // 锁定方块
+    int clearCompletedLines();              // 消除所有完整行
+    void updateGameStats(int linesCleared); // 更新游戏数据
+    void calculateScore(int linesCleared);  // 计算得分
+    void updateLevel();                     // 更新游戏等级
 
     // 辅助方法
-    bool isValidPosition(const Block& block, int dx = 0, int dy = 0) const;
-    void resetGameStats();
+    bool isValidPosition(const Block &block, int dx = 0,
+                         int dy = 0) const; // 检测位置是否合法
+    void resetGameStats();                  // 重置游戏数据
 
     // 幽灵方块计算
     Position calculateGhostPosition() const;
@@ -100,19 +102,19 @@ private:
     GameStats m_gameStats;
 
     // 计时器
-    QTimer* m_gameTimer;
+    QTimer *m_gameTimer;
 
     // 动态下落相关
-    float m_fallProgress;      // 下落进度 0.0 - 1.0
-    bool m_fastDrop;           // 是否快速下落
-    int m_fallSpeed;           // 下落速度 (ms)
-    int m_fastFallSpeed;       // 快速下落速度 (ms)
-    qint64 m_lastUpdateTime;   // 上次更新时间
+    float m_fallProgress;    // 下落进度 0.0 - 1.0
+    bool m_fastDrop;         // 是否快速下落
+    int m_fallSpeed;         // 下落速度 (ms/cell)
+    int m_fastFallSpeed;     // 快速下落速度 (ms/cell)
+    qint64 m_lastUpdateTime; // 上次更新时间
 
     // 系统组件
     QScopedPointer<BlockFactory> m_blockFactory;
 
-    bool m_ghostEnabled;  // 是否显示幽灵方块
+    bool m_ghostEnabled{true}; // 是否显示幽灵方块
 };
 
 #endif // GAMEENGINE_H

@@ -24,8 +24,9 @@ add_executable(Tetris WIN32
   GameField.h GameField.cpp
   InputHandler.h InputHandler.cpp
   ScoreManager.h ScoreManager.cpp
-  TetrisGame.h TetrisGame.cpp
-  ${RESOURCE_FILES}  # 包含资源文件
+  MainWindow.h MainWindow.cpp
+  ${RESOURCE_FILES}
+  GameWidget.h GameWidget.cpp  # 包含资源文件
 )
 
 target_link_libraries(Tetris PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)

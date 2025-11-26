@@ -4,7 +4,6 @@
 BlockFactory::BlockFactory(QObject* parent)
     : QObject(parent)
     , m_randomizerType("7-bag")
-    , m_previewCount(3)
     , m_randomEngine(std::random_device{}())
 {
     initializeStandardBlocks();
@@ -33,6 +32,7 @@ void BlockFactory::initializeStandardBlocks()
 
 Block::BlockShape BlockFactory::createStandardShape(Block::BlockType type)
 {
+    // 定义好每个方块的形状和其他属性
     Block::BlockShape shape;
     switch (type) {
     case Block::TYPE_I:
@@ -140,7 +140,7 @@ Block BlockFactory::createRandomBlock()
     // 验证生成的类型是否有效
     if (type < 0 || type >= Block::TYPE_COUNT) {
         qDebug() << "ERROR: Generated invalid block type:" << type << ", falling back to TYPE_I";
-        type = Block::TYPE_I;
+        type = Block::TYPE_I; // 回退到I方块
     }
 
     Block block = createBlock(type);

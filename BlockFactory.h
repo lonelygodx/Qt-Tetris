@@ -19,8 +19,6 @@ public:
 
     // 配置
     void setRandomizerType(const QString& type) { m_randomizerType = type; resetBag(); }
-    void setPreviewCount(int count) { m_previewCount = count; }
-    int getPreviewCount() const { return m_previewCount; }
 
 private:
     // 预定义方块
@@ -33,14 +31,12 @@ private:
     void resetBag();
 
     // 成员变量
-    QHash<Block::BlockType, Block::BlockShape> m_standardBlocks;
-    QVector<Block::BlockType> m_availableTypes;
+    QHash<Block::BlockType, Block::BlockShape> m_standardBlocks;  // 标准方块集合
+    QVector<Block::BlockType> m_availableTypes;                   // 合法方块类型集合
 
     // 随机化状态
-    QString m_randomizerType;
-    QVector<Block::BlockType> m_bag;
-    QVector<Block::BlockType> m_history;
-    int m_previewCount;
+    QString m_randomizerType;           // 生成方块算法
+    QVector<Block::BlockType> m_bag;    // 7-bags模式方块队列
 
     // 随机数生成
     std::mt19937 m_randomEngine;

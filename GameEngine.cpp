@@ -56,6 +56,7 @@ void GameEngine::startGame()
     m_gameField.clearField();
     m_canHold = true;
     m_fallProgress = 0.0f;
+    m_fallSpeed = 1000;
     m_fastDrop = false;
     m_lastUpdateTime = QDateTime::currentMSecsSinceEpoch();
 
@@ -171,20 +172,6 @@ bool GameEngine::moveRight()
     if (isValidPosition(m_currentBlock, 1, 0)) {
         m_currentBlock.move(1, 0);
         emit currentBlockChanged(); // 这会触发重绘，包括幽灵方块
-        return true;
-    }
-    return false;
-}
-
-bool GameEngine::moveDown()
-{
-    if (m_gameState != STATE_RUNNING) return false;
-
-    // 直接检查是否可以下落，不依赖进度
-    if (isValidPosition(m_currentBlock, 0, 1)) {
-        m_currentBlock.move(0, 1);
-        m_fallProgress = 0.0f; // 重置进度
-        emit currentBlockChanged();
         return true;
     }
     return false;
@@ -356,7 +343,7 @@ void GameEngine::spawnNewBlock()
     bool canSpawn = true;
     QVector<Position> cells = m_currentBlock.getOccupiedCells();
 
-    for (const Position& cell : cells) {
+    for (const Position& cell : std::as_const(cells)) {
         // 检查新方块是否会与已有方块重叠
         if (cell.y >= 0 && cell.y < m_gameField.getHeight() &&
             cell.x >= 0 && cell.x < m_gameField.getWidth()) {
@@ -390,7 +377,7 @@ void GameEngine::placeCurrentBlock()
     QVector<Position> cells = m_currentBlock.getOccupiedCells();
     QColor blockColor = m_currentBlock.getColor();
 
-    for (const Position& cell : cells) {
+    for (const Position& cell : std::as_const(cells)) {
         if (cell.x >= 0 && cell.x < m_gameField.getWidth() &&
             cell.y >= 0 && cell.y < m_gameField.getHeight()) {
             m_gameField.setCell(cell.x, cell.y, blockColor);
@@ -473,7 +460,7 @@ bool GameEngine::isValidPosition(const Block& block, int dx, int dy) const
 {
     QVector<Position> cells = block.getOccupiedCells();
 
-    for (const Position& cell : cells) {
+    for (const Position& cell : std::as_const(cells)) {
         int testX = cell.x + dx;
         int testY = cell.y + dy;
 

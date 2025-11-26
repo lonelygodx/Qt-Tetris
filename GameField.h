@@ -35,6 +35,7 @@ public:
     void removeLines(const QVector<int>& lines);
     int removeAllCompleteLines();
 
+    // 调试函数
     void debugPrintField() const;
 
 private:
