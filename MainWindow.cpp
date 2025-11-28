@@ -144,6 +144,8 @@ void MainWindow::setupGameConnections()
                         break;
                     }
                 });
+        // 连接引擎等级更新和输入延迟变化
+        connect(m_gameEngine.data(), &GameEngine::updateNewLevel, m_inputHandler.data(), &InputHandler::updateAutoRepeatDelay);
     }
 
     // 处理按键释放（特别是软下落释放）
@@ -421,14 +423,14 @@ void MainWindow::onHoldBlockChanged()
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-    if (!m_inputHandler->processKeyEvent(event)) {
+    if (!event->isAutoRepeat() && !m_inputHandler->processKeyEvent(event)) {
         QMainWindow::keyPressEvent(event);
     }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
 {
-    if (!m_inputHandler->processKeyEvent(event)) {
+    if (!event->isAutoRepeat() && !m_inputHandler->processKeyEvent(event)) {
         QMainWindow::keyReleaseEvent(event);
     }
 }

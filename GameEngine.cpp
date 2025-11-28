@@ -453,6 +453,8 @@ void GameEngine::updateLevel()
 
         // 提高下落速度
         m_fallSpeed = qMax(100, 1000 - (m_gameStats.level - 1) * 100);
+
+        emit updateNewLevel(newLevel);
     }
 }
 

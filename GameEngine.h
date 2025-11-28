@@ -70,6 +70,9 @@ signals:
     void nextBlockChanged();
     void holdBlockChanged();
 
+    // 更新等级信号
+    void updateNewLevel(int level);
+
 private slots:
     void updateGame();
 
@@ -85,8 +88,7 @@ private:
     void updateLevel();                     // 更新游戏等级
 
     // 辅助方法
-    bool isValidPosition(const Block &block, int dx = 0,
-                         int dy = 0) const; // 检测位置是否合法
+    bool isValidPosition(const Block &block, int dx = 0, int dy = 0) const; // 检测位置是否合法
     void resetGameStats();                  // 重置游戏数据
 
     // 幽灵方块计算

@@ -28,7 +28,7 @@ public:
         int autoRepeatDelay;    // 自动重复延迟(ms)
         int autoRepeatInterval; // 自动重复间隔(ms)
 
-        InputConfig() : autoRepeatDelay(150), autoRepeatInterval(50) {}
+        InputConfig() : autoRepeatDelay(100), autoRepeatInterval(50) {}
     };
 
     explicit InputHandler(QObject* parent = nullptr);
@@ -44,10 +44,25 @@ signals:
     void actionTriggered(InputHandler::GameAction action);
     void actionReleased(InputHandler::GameAction action);
 
+public slots:
+    void updateAutoRepeatDelay(int level);
+
+private slots:
+    void onAutoRepeat();
+
 private:
     void initializeDefaultMapping();
+    void startAutoRepeat(GameAction action);
+    void stopAutoRepeat();
 
+    // 输入配置
     InputConfig m_config;
+    int add_autoRepeatDelay;
+
+    // 自动重复状态
+    QTimer* m_autoRepeatTimer;
+    GameAction m_currentRepeatingAction;
+    bool m_isRepeating;
 };
 
 #endif // INPUTHANDLER_H
