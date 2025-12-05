@@ -31,14 +31,12 @@ class NextBlockWidget : public QWidget
 public:
     explicit NextBlockWidget(QWidget* parent = nullptr);
     void setNextBlock(const Block& block);
-    void setCellSize(int size) { m_cellSize = size; }
 
 protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
     Block m_nextBlock;
-    int m_cellSize;
 };
 
 // 暂存方块预览界面
@@ -49,14 +47,12 @@ class HoldBlockWidget : public QWidget
 public:
     explicit HoldBlockWidget(QWidget* parent = nullptr);
     void setHoldBlock(const Block& block);
-    void setCellSize(int size) { m_cellSize = size; }
 
 protected:
     void paintEvent(QPaintEvent* event) override;
 
 private:
     Block m_holdBlock;
-    int m_cellSize;
 };
 
 #endif // GAMEWIDGET_H

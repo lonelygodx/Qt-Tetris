@@ -23,19 +23,7 @@ public:
         ACTION_COUNT
     };
 
-    struct InputConfig {
-        QHash<Qt::Key, GameAction> keyMapping; // 按键映射
-        int autoRepeatDelay;    // 自动重复延迟(ms)
-        int autoRepeatInterval; // 自动重复间隔(ms)
-
-        InputConfig() : autoRepeatDelay(100), autoRepeatInterval(50) {}
-    };
-
     explicit InputHandler(QObject* parent = nullptr);
-
-    // 配置管理
-    void setInputConfig(const InputConfig& config);
-    InputConfig getInputConfig() const { return m_config; }
 
     // 输入处理
     bool processKeyEvent(QKeyEvent* event);
@@ -56,7 +44,7 @@ private:
     void stopAutoRepeat();
 
     // 输入配置
-    InputConfig m_config;
+    QHash<Qt::Key, GameAction> keyMapping; // 按键映射
     int add_autoRepeatDelay;
 
     // 自动重复状态

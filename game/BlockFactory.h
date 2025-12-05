@@ -18,7 +18,7 @@ public:
     Block createBlock(Block::BlockType type);
 
     // 配置
-    void setRandomizerType(const QString& type) { m_randomizerType = type; resetBag(); }
+    //void setRandomizerType(const QString& type) { RANDOMIZER_TYPE = type; resetBag(); }
 
 private:
     // 预定义方块
@@ -35,7 +35,6 @@ private:
     QVector<Block::BlockType> m_availableTypes;                   // 合法方块类型集合
 
     // 随机化状态
-    QString m_randomizerType;           // 生成方块算法
     QVector<Block::BlockType> m_bag;    // 7-bags模式方块队列
 
     // 随机数生成

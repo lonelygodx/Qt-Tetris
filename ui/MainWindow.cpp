@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QMenuBar>
 #include "MainWindow.h"
+#include "GameConfig.h"
 
 // MainWindow 实现
 MainWindow::MainWindow(QWidget* parent)
@@ -57,7 +58,7 @@ void MainWindow::initializeSystems()
 void MainWindow::setupUI()
 {
     setWindowTitle("俄罗斯方块");
-    setFixedSize(800, 700);
+    setFixedSize(MAINWINDOW_FIXED_SIZEW, MAINWINDOW_FIXED_SIZEH);
 
     // 创建主堆叠窗口
     m_stackedWidget = new QStackedWidget(this);
@@ -169,12 +170,12 @@ void MainWindow::setupGameConnections()
 void MainWindow::createMenuWidget()
 {
     m_menuWidget = new QWidget(this);
-    QVBoxLayout* menuLayout = new QVBoxLayout(m_menuWidget);
+    m_menuLayout = new QVBoxLayout(m_menuWidget);
 
     m_startButton = new QPushButton("开始游戏", this);
     m_highScoresButton = new QPushButton("高分榜", this);
-    QPushButton* helpButton = new QPushButton("帮助", this);
-    QPushButton* quitButton = new QPushButton("退出", this);
+    m_helpButton = new QPushButton("帮助", this);
+    m_quitButton = new QPushButton("退出", this);
 
     // 设置菜单按钮样式
     QString buttonStyle = "QPushButton { "
@@ -192,16 +193,16 @@ void MainWindow::createMenuWidget()
 
     m_startButton->setStyleSheet(buttonStyle);
     m_highScoresButton->setStyleSheet(buttonStyle);
-    helpButton->setStyleSheet(buttonStyle);
-    quitButton->setStyleSheet(buttonStyle);
+    m_helpButton->setStyleSheet(buttonStyle);
+    m_quitButton->setStyleSheet(buttonStyle);
 
-    menuLayout->addStretch();
-    menuLayout->addWidget(m_startButton);
-    menuLayout->addWidget(m_highScoresButton);
-    menuLayout->addWidget(helpButton);
-    menuLayout->addWidget(quitButton);
-    menuLayout->addStretch();
-    menuLayout->setAlignment(Qt::AlignCenter);
+    m_menuLayout->addStretch();
+    m_menuLayout->addWidget(m_startButton);
+    m_menuLayout->addWidget(m_highScoresButton);
+    m_menuLayout->addWidget(m_helpButton);
+    m_menuLayout->addWidget(m_quitButton);
+    m_menuLayout->addStretch();
+    m_menuLayout->setAlignment(Qt::AlignCenter);
 
     m_stackedWidget->addWidget(m_menuWidget);
 }
@@ -213,8 +214,8 @@ void MainWindow::createGameScreen()
     m_mainGameLayout = new QHBoxLayout(m_gameScreen);
 
     // 创建左侧游戏区域
-    QWidget* gameArea = new QWidget(this);
-    m_gameAreaLayout = new QVBoxLayout(gameArea);
+    m_gameArea = new QWidget(this);
+    m_gameAreaLayout = new QVBoxLayout(m_gameArea);
 
     m_gameWidget = new GameWidget(this);
 
@@ -229,14 +230,14 @@ void MainWindow::createGameScreen()
     m_gameAreaLayout->setAlignment(m_gameWidget, Qt::AlignCenter);
 
     // 创建右侧信息面板
-    QWidget* infoPanel = createInfoPanel();
+    m_infoPanel = createInfoPanel();
 
     // 添加到主布局
-    m_mainGameLayout->addWidget(gameArea);
-    m_mainGameLayout->addWidget(infoPanel);
+    m_mainGameLayout->addWidget(m_gameArea);
+    m_mainGameLayout->addWidget(m_infoPanel);
 
     // 设置背景
-    gameArea->setStyleSheet("background-color: rgba(20, 20, 20, 200);");
+    m_gameArea->setStyleSheet("background-color: rgba(20, 20, 20, 200);");
 
     m_stackedWidget->addWidget(m_gameScreen);
 }
@@ -244,7 +245,7 @@ void MainWindow::createGameScreen()
 QWidget* MainWindow::createInfoPanel()
 {
     QWidget* infoPanel = new QWidget(this);
-    infoPanel->setFixedWidth(220);
+    infoPanel->setFixedWidth(INFOPANELWIDGETWIDTH);
     m_infoPanelLayout = new QVBoxLayout(infoPanel);
 
     // 游戏状态信息
@@ -259,8 +260,8 @@ QWidget* MainWindow::createInfoPanel()
     m_linesLabel->setStyleSheet(labelStyle);
 
     // Hold方块预览
-    QLabel* holdLabel = new QLabel("暂存方块:", this);
-    holdLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 5px; }");
+    m_holdLabel = new QLabel("暂存方块:", this);
+    m_holdLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 5px; }");
 
     m_holdBlockWidget = new HoldBlockWidget(this);
 
@@ -270,8 +271,8 @@ QWidget* MainWindow::createInfoPanel()
     }
 
     // 下一个方块预览
-    QLabel* nextLabel = new QLabel("下一个方块:", this);
-    nextLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 5px; }");
+    m_nextLabel = new QLabel("下一个方块:", this);
+    m_nextLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 5px; }");
 
     m_nextBlockWidget = new NextBlockWidget(this);
 
@@ -281,10 +282,10 @@ QWidget* MainWindow::createInfoPanel()
     }
 
     // 控制说明
-    QLabel* controlsLabel = new QLabel("控制说明:", this);
-    controlsLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 5px; margin-top: 20px; }");
+    m_controlsLabel = new QLabel("控制说明:", this);
+    m_controlsLabel->setStyleSheet("QLabel { color: white; font-size: 14px; font-weight: bold; padding: 5px; margin-top: 20px; }");
 
-    QLabel* controlsText = new QLabel(
+    m_controlsText = new QLabel(
         "←→或AD : 左右移动\n"
         "↑或W : 顺时针旋转\n"
         "Z : 逆时针旋转\n"
@@ -293,7 +294,7 @@ QWidget* MainWindow::createInfoPanel()
         "C : 暂存方块\n"
         "P : 暂停/继续\n"
         "R : 重新开始", this);
-    controlsText->setStyleSheet("QLabel { color: lightgray; font-size: 12px; padding: 5px; line-height: 1.5; }");
+    m_controlsText->setStyleSheet("QLabel { color: lightgray; font-size: 12px; padding: 5px; line-height: 1.5; }");
 
     // 添加到信息面板布局
     m_infoPanelLayout->addWidget(m_scoreLabel);
@@ -301,16 +302,16 @@ QWidget* MainWindow::createInfoPanel()
     m_infoPanelLayout->addWidget(m_linesLabel);
     m_infoPanelLayout->addSpacing(10);
     // 添加下一个方块预览
-    m_infoPanelLayout->addWidget(nextLabel);
+    m_infoPanelLayout->addWidget(m_nextLabel);
     m_infoPanelLayout->addWidget(m_nextBlockWidget);
     m_infoPanelLayout->addSpacing(10);
     // 添加Hold方块预览
-    m_infoPanelLayout->addWidget(holdLabel);
+    m_infoPanelLayout->addWidget(m_holdLabel);
     m_infoPanelLayout->addWidget(m_holdBlockWidget);
     m_infoPanelLayout->addSpacing(10);
     // 控制说明信息面板
-    m_infoPanelLayout->addWidget(controlsLabel);
-    m_infoPanelLayout->addWidget(controlsText);
+    m_infoPanelLayout->addWidget(m_controlsLabel);
+    m_infoPanelLayout->addWidget(m_controlsText);
     m_infoPanelLayout->addStretch();
 
     // 设置信息面板背景
@@ -322,10 +323,10 @@ QWidget* MainWindow::createInfoPanel()
 void MainWindow::createPauseWidget()
 {
     m_pauseWidget = new QWidget(this);
-    QVBoxLayout* pauseLayout = new QVBoxLayout(m_pauseWidget);
+    m_pauseLayout = new QVBoxLayout(m_pauseWidget);
 
     m_pauseButton = new QPushButton("继续游戏", this);
-    QPushButton* menuButton = new QPushButton("返回主菜单", this);
+    m_menuButton = new QPushButton("返回主菜单", this);
 
     // 设置暂停界面按钮样式
     QString pauseButtonStyle = "QPushButton { "
@@ -342,13 +343,13 @@ void MainWindow::createPauseWidget()
                                "}";
 
     m_pauseButton->setStyleSheet(pauseButtonStyle);
-    menuButton->setStyleSheet(pauseButtonStyle);
+    m_menuButton->setStyleSheet(pauseButtonStyle);
 
-    pauseLayout->addStretch();
-    pauseLayout->addWidget(m_pauseButton);
-    pauseLayout->addWidget(menuButton);
-    pauseLayout->addStretch();
-    pauseLayout->setAlignment(Qt::AlignCenter);
+    m_pauseLayout->addStretch();
+    m_pauseLayout->addWidget(m_pauseButton);
+    m_pauseLayout->addWidget(m_menuButton);
+    m_pauseLayout->addStretch();
+    m_pauseLayout->setAlignment(Qt::AlignCenter);
 
     m_stackedWidget->addWidget(m_pauseWidget);
 }
@@ -372,15 +373,12 @@ void MainWindow::setupBasicConnections()
         connect(m_highScoresButton, &QPushButton::clicked, this, &MainWindow::showHighScores);
     }
 
-    // 连接其他按钮
-    QList<QPushButton*> buttons = m_menuWidget->findChildren<QPushButton*>();
+    if (m_helpButton) {
+        connect(m_helpButton, &QPushButton::clicked, this, &MainWindow::showHelp);
+    }
 
-    for (QPushButton* button : std::as_const(buttons)) {
-        if (button->text() == "帮助") {
-            connect(button, &QPushButton::clicked, this, &MainWindow::showHelp);
-        } else if (button->text() == "退出") {
-            connect(button, &QPushButton::clicked, this, &QApplication::quit);
-        }
+    if (m_quitButton) {
+        connect(m_quitButton, &QPushButton::clicked, this, &QApplication::quit);
     }
 
     // 连接暂停界面按钮
@@ -392,16 +390,13 @@ void MainWindow::setupBasicConnections()
         });
     }
 
-    QList<QPushButton*> pauseButtons = m_pauseWidget->findChildren<QPushButton*>();
-    for (QPushButton* button : std::as_const(pauseButtons)) {
-        if (button->text() == "返回主菜单") {
-            connect(button, &QPushButton::clicked, this, [this]() {
-                if (m_gameEngine) {
-                    m_gameEngine->endGame();
-                }
-                m_stackedWidget->setCurrentWidget(m_menuWidget);
-            });
-        }
+    if (m_menuButton) {
+        connect(m_menuButton, &QPushButton::clicked, this, [this]() {
+            if (m_gameEngine) {
+                m_gameEngine->endGame();
+            }
+            m_stackedWidget->setCurrentWidget(m_menuWidget);
+        });
     }
 }
 
@@ -421,6 +416,7 @@ void MainWindow::onHoldBlockChanged()
     }
 }
 
+// 系统槽函数
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     if (!event->isAutoRepeat() && !m_inputHandler->processKeyEvent(event)) {

@@ -45,6 +45,16 @@ set(UI_HEADERS
   ui/MainWindow.h
 )
 
+set(CONFIG_SOURCES
+  config/GameConfig.cpp
+  config/GameConfig.cpp
+)
+
+set(CONFIG_HEADERS
+  config/GameConfig.h
+  config/GameConfig.h
+)
+
 set(DATA_HEADERS
   data/GameStats.h
   data/Position.h
@@ -64,8 +74,10 @@ add_executable(Tetris WIN32
   ${GAME_HEADERS}
   ${UI_SOURCES}
   ${UI_HEADERS}
+  ${CONFIG_SOURCES}
+  ${CONFIG_HEADERS}
   ${DATA_HEADERS}
-  ${RESOURCE_FILES}  # 包含资源文件
+  ${RESOURCE_FILES}
 )
 
 # 添加头文件包含路径
@@ -75,6 +87,7 @@ target_include_directories(Tetris PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/ui
   ${CMAKE_CURRENT_SOURCE_DIR}/data
   ${CMAKE_CURRENT_SOURCE_DIR}/simpleini
+  ${CMAKE_CURRENT_SOURCE_DIR}/config
 )
 
 target_link_libraries(Tetris PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Sql)

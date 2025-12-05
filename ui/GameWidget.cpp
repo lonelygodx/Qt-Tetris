@@ -1,12 +1,14 @@
 #include <QPainter>
 #include "GameWidget.h"
+#include "GameConfig.h"
+#include "GameConfig.h"
 
 // GameWidget 实现
 GameWidget::GameWidget(QWidget* parent)
     : QWidget(parent)
     , m_engine(nullptr)
 {
-    setFixedSize(300, 600);
+    setFixedSize(GAMEWIDGET_FIXED_SIZEW, GAMEWIDGET_FIXED_SIZEH);
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -36,22 +38,21 @@ void GameWidget::paintEvent(QPaintEvent* event)
 
     // 绘制游戏场地
     const auto& field = m_engine->getGameField();
-    int cellSize = 30;
 
     // 绘制网格
     painter.setPen(QPen(QColor(40, 40, 40), 1));
     for (int x = 0; x <= field.getWidth(); ++x) {
-        painter.drawLine(x * cellSize, 0, x * cellSize, field.getHeight() * cellSize);
+        painter.drawLine(x * FIELD_CELL_SIZE, 0, x * FIELD_CELL_SIZE, field.getHeight() * FIELD_CELL_SIZE);
     }
     for (int y = 0; y <= field.getHeight(); ++y) {
-        painter.drawLine(0, y * cellSize, field.getWidth() * cellSize, y * cellSize);
+        painter.drawLine(0, y * FIELD_CELL_SIZE, field.getWidth() * FIELD_CELL_SIZE, y * FIELD_CELL_SIZE);
     }
 
     // 绘制已放置的方块
     drawGameField(painter);
 
     // 绘制幽灵方块
-    if (m_engine->getGameState() == GameEngine::STATE_RUNNING && m_engine->isGhostBlockEnabled()) {
+    if (m_engine->getGameState() == GameEngine::STATE_RUNNING && GHOST_BLOCK_ENABLED) {
         drawGhostBlock(painter);
     }
 
@@ -66,7 +67,6 @@ void GameWidget::drawGameField(QPainter& painter)
     if (!m_engine) return;
 
     const auto& field = m_engine->getGameField();
-    int cellSize = 30;
 
     // 绘制已放置的方块
     for (int y = 0; y < field.getHeight(); ++y) {
@@ -75,21 +75,21 @@ void GameWidget::drawGameField(QPainter& painter)
                 QColor color = field.getCellColor(x, y);
 
                 // 绘制方块主体
-                painter.fillRect(x * cellSize, y * cellSize, cellSize, cellSize, color);
+                painter.fillRect(x * FIELD_CELL_SIZE, y * FIELD_CELL_SIZE, FIELD_CELL_SIZE, FIELD_CELL_SIZE, color);
 
                 // 绘制高光效果
                 painter.setPen(QPen(QColor(255, 255, 255, 150), 2));
-                painter.drawLine(x * cellSize, y * cellSize, (x + 1) * cellSize, y * cellSize);
-                painter.drawLine(x * cellSize, y * cellSize, x * cellSize, (y + 1) * cellSize);
+                painter.drawLine(x * FIELD_CELL_SIZE, y * FIELD_CELL_SIZE, (x + 1) * FIELD_CELL_SIZE, y * FIELD_CELL_SIZE);
+                painter.drawLine(x * FIELD_CELL_SIZE, y * FIELD_CELL_SIZE, x * FIELD_CELL_SIZE, (y + 1) * FIELD_CELL_SIZE);
 
                 // 绘制阴影效果
                 painter.setPen(QPen(QColor(0, 0, 0, 100), 2));
-                painter.drawLine((x + 1) * cellSize, y * cellSize, (x + 1) * cellSize, (y + 1) * cellSize);
-                painter.drawLine(x * cellSize, (y + 1) * cellSize, (x + 1) * cellSize, (y + 1) * cellSize);
+                painter.drawLine((x + 1) * FIELD_CELL_SIZE, y * FIELD_CELL_SIZE, (x + 1) * FIELD_CELL_SIZE, (y + 1) * FIELD_CELL_SIZE);
+                painter.drawLine(x * FIELD_CELL_SIZE, (y + 1) * FIELD_CELL_SIZE, (x + 1) * FIELD_CELL_SIZE, (y + 1) * FIELD_CELL_SIZE);
 
                 // 绘制内部细节
                 painter.setPen(QPen(QColor(255, 255, 255, 50), 1));
-                painter.drawRect(x * cellSize + 2, y * cellSize + 2, cellSize - 4, cellSize - 4);
+                painter.drawRect(x * FIELD_CELL_SIZE + 2, y * FIELD_CELL_SIZE + 2, FIELD_CELL_SIZE - 4, FIELD_CELL_SIZE - 4);
             }
         }
     }
@@ -113,13 +113,11 @@ void GameWidget::drawGhostBlock(QPainter& painter)
     // 设置幽灵方块的颜色（半透明）
     ghostColor.setAlpha(80);
 
-    int cellSize = 30;
-
     // 绘制幽灵方块
     for (const auto& cell : std::as_const(cells)) {
         if (cell.y >= 0) {
             // 绘制虚影
-            painter.fillRect(cell.x * cellSize, cell.y * cellSize, cellSize, cellSize, ghostColor);
+            painter.fillRect(cell.x * FIELD_CELL_SIZE, cell.y * FIELD_CELL_SIZE, FIELD_CELL_SIZE, FIELD_CELL_SIZE, ghostColor);
         }
     }
 
@@ -155,10 +153,10 @@ void GameWidget::drawGhostBlock(QPainter& painter)
     //         painter.setPen(linePen);
 
     //         painter.drawLine(
-    //             currentCenter.x * cellSize + cellSize / 2,
-    //             currentCenter.y * cellSize + cellSize / 2,
-    //             ghostCenter.x * cellSize + cellSize / 2,
-    //             ghostCenter.y * cellSize + cellSize / 2
+    //             currentCenter.x * FIELD_CELL_SIZE + FIELD_CELL_SIZE / 2,
+    //             currentCenter.y * FIELD_CELL_SIZE + FIELD_CELL_SIZE / 2,
+    //             ghostCenter.x * FIELD_CELL_SIZE + FIELD_CELL_SIZE / 2,
+    //             ghostCenter.y * FIELD_CELL_SIZE + FIELD_CELL_SIZE / 2
     //         );
     //     }
     // }
@@ -175,29 +173,27 @@ void GameWidget::drawCurrentBlock(QPainter& painter)
     // 获取下落进度
     float fallProgress = m_engine->getFallProgress();
 
-    int cellSize = 30;
-
     painter.setBrush(blockColor);
     painter.setPen(QPen(Qt::white, 2));
 
     for (const auto& cell : std::as_const(cells)) {
         // 计算实际绘制位置（包括下落进度）
         float actualY = cell.y + static_cast<int>(trunc(fallProgress));  // 对下落进度取整，防止出现在某一格内的情况
-        int drawY = actualY * cellSize;
+        int drawY = actualY * FIELD_CELL_SIZE;
 
         // 只绘制场地内的部分
         if (actualY >= 0 && actualY < m_engine->getGameField().getHeight()) {
-            painter.drawRect(cell.x * cellSize, drawY, cellSize, cellSize);
+            painter.drawRect(cell.x * FIELD_CELL_SIZE, drawY, FIELD_CELL_SIZE, FIELD_CELL_SIZE);
 
             // 绘制高光效果
             painter.setPen(QPen(QColor(255, 255, 255, 200), 2));
-            painter.drawLine(cell.x * cellSize, drawY, (cell.x + 1) * cellSize, drawY);
-            painter.drawLine(cell.x * cellSize, drawY, cell.x * cellSize, drawY + cellSize);
+            painter.drawLine(cell.x * FIELD_CELL_SIZE, drawY, (cell.x + 1) * FIELD_CELL_SIZE, drawY);
+            painter.drawLine(cell.x * FIELD_CELL_SIZE, drawY, cell.x * FIELD_CELL_SIZE, drawY + FIELD_CELL_SIZE);
 
             // 绘制阴影效果
             painter.setPen(QPen(QColor(0, 0, 0, 100), 2));
-            painter.drawLine((cell.x + 1) * cellSize, drawY, (cell.x + 1) * cellSize, drawY + cellSize);
-            painter.drawLine(cell.x * cellSize, drawY + cellSize, (cell.x + 1) * cellSize, drawY + cellSize);
+            painter.drawLine((cell.x + 1) * FIELD_CELL_SIZE, drawY, (cell.x + 1) * FIELD_CELL_SIZE, drawY + FIELD_CELL_SIZE);
+            painter.drawLine(cell.x * FIELD_CELL_SIZE, drawY + FIELD_CELL_SIZE, (cell.x + 1) * FIELD_CELL_SIZE, drawY + FIELD_CELL_SIZE);
         }
     }
 }
@@ -205,9 +201,8 @@ void GameWidget::drawCurrentBlock(QPainter& painter)
 // 下一个方块的预览实现
 NextBlockWidget::NextBlockWidget(QWidget* parent)
     : QWidget(parent)
-    , m_cellSize(20)  // 预览窗口的单元格较小
 {
-    setFixedSize(120, 120);  // 固定大小，适合显示方块
+    setFixedSize(BLOCKWIDGET_FIXED_SIZEW, BLOCKWIDGET_FIXED_SIZEH);  // 固定大小，适合显示方块
     setStyleSheet("background-color: rgba(30, 30, 30, 200); border: 2px solid gray;");
 }
 
@@ -246,8 +241,8 @@ void NextBlockWidget::paintEvent(QPaintEvent* event)
 
     // 计算居中位置
     QRect blockBounds = m_nextBlock.getBoundingBox();
-    int blockWidth = blockBounds.width() * m_cellSize;
-    int blockHeight = blockBounds.height() * m_cellSize;
+    int blockWidth = blockBounds.width() * WIDGET_CELL_SIZE;
+    int blockHeight = blockBounds.height() * WIDGET_CELL_SIZE;
 
     int startX = (width() - blockWidth) / 2;
     int startY = (height() - blockHeight) / 2 + 15;  // 向下偏移为标题留空间
@@ -257,28 +252,27 @@ void NextBlockWidget::paintEvent(QPaintEvent* event)
 
     for (const auto& cell : std::as_const(cells)) {
         // 计算在预览窗口中的位置（相对于方块边界）
-        int drawX = startX + (cell.x - blockBounds.x()) * m_cellSize;
-        int drawY = startY + (cell.y - blockBounds.y()) * m_cellSize;
+        int drawX = startX + (cell.x - blockBounds.x()) * WIDGET_CELL_SIZE;
+        int drawY = startY + (cell.y - blockBounds.y()) * WIDGET_CELL_SIZE;
 
-        painter.drawRect(drawX, drawY, m_cellSize, m_cellSize);
+        painter.drawRect(drawX, drawY, WIDGET_CELL_SIZE, WIDGET_CELL_SIZE);
 
         // 添加简单的3D效果
         painter.setPen(QPen(QColor(255, 255, 255, 150), 1));
-        painter.drawLine(drawX, drawY, drawX + m_cellSize, drawY);
-        painter.drawLine(drawX, drawY, drawX, drawY + m_cellSize);
+        painter.drawLine(drawX, drawY, drawX + WIDGET_CELL_SIZE, drawY);
+        painter.drawLine(drawX, drawY, drawX, drawY + WIDGET_CELL_SIZE);
 
         painter.setPen(QPen(QColor(0, 0, 0, 100), 1));
-        painter.drawLine(drawX + m_cellSize, drawY, drawX + m_cellSize, drawY + m_cellSize);
-        painter.drawLine(drawX, drawY + m_cellSize, drawX + m_cellSize, drawY + m_cellSize);
+        painter.drawLine(drawX + WIDGET_CELL_SIZE, drawY, drawX + WIDGET_CELL_SIZE, drawY + WIDGET_CELL_SIZE);
+        painter.drawLine(drawX, drawY + WIDGET_CELL_SIZE, drawX + WIDGET_CELL_SIZE, drawY + WIDGET_CELL_SIZE);
     }
 }
 
 // HoldBlockWidget实现
 HoldBlockWidget::HoldBlockWidget(QWidget* parent)
     : QWidget(parent)
-    , m_cellSize(20)  // 与下一个方块预览相同的单元格大小
 {
-    setFixedSize(120, 120);  // 固定大小
+    setFixedSize(BLOCKWIDGET_FIXED_SIZEW, BLOCKWIDGET_FIXED_SIZEH);  // 固定大小
     setStyleSheet("background-color: rgba(30, 30, 30, 200); border: 2px solid gray;");
 }
 
@@ -331,8 +325,8 @@ void HoldBlockWidget::paintEvent(QPaintEvent* event)
 
     // 计算居中位置
     QRect blockBounds = m_holdBlock.getBoundingBox();
-    int blockWidth = blockBounds.width() * m_cellSize;
-    int blockHeight = blockBounds.height() * m_cellSize;
+    int blockWidth = blockBounds.width() * WIDGET_CELL_SIZE;
+    int blockHeight = blockBounds.height() * WIDGET_CELL_SIZE;
 
     int startX = (width() - blockWidth) / 2;
     int startY = (height() - blockHeight) / 2 + 15;  // 向下偏移为标题留空间
@@ -342,19 +336,19 @@ void HoldBlockWidget::paintEvent(QPaintEvent* event)
 
     for (const auto& cell : std::as_const(cells)) {
         // 计算在预览窗口中的位置（相对于方块边界）
-        int drawX = startX + (cell.x - blockBounds.x()) * m_cellSize;
-        int drawY = startY + (cell.y - blockBounds.y()) * m_cellSize;
+        int drawX = startX + (cell.x - blockBounds.x()) * WIDGET_CELL_SIZE;
+        int drawY = startY + (cell.y - blockBounds.y()) * WIDGET_CELL_SIZE;
 
-        painter.drawRect(drawX, drawY, m_cellSize, m_cellSize);
+        painter.drawRect(drawX, drawY, WIDGET_CELL_SIZE, WIDGET_CELL_SIZE);
 
         // 添加简单的3D效果
         painter.setPen(QPen(QColor(255, 255, 255, 150), 1));
-        painter.drawLine(drawX, drawY, drawX + m_cellSize, drawY);
-        painter.drawLine(drawX, drawY, drawX, drawY + m_cellSize);
+        painter.drawLine(drawX, drawY, drawX + WIDGET_CELL_SIZE, drawY);
+        painter.drawLine(drawX, drawY, drawX, drawY + WIDGET_CELL_SIZE);
 
         painter.setPen(QPen(QColor(0, 0, 0, 100), 1));
-        painter.drawLine(drawX + m_cellSize, drawY, drawX + m_cellSize, drawY + m_cellSize);
-        painter.drawLine(drawX, drawY + m_cellSize, drawX + m_cellSize, drawY + m_cellSize);
+        painter.drawLine(drawX + WIDGET_CELL_SIZE, drawY, drawX + WIDGET_CELL_SIZE, drawY + WIDGET_CELL_SIZE);
+        painter.drawLine(drawX, drawY + WIDGET_CELL_SIZE, drawX + WIDGET_CELL_SIZE, drawY + WIDGET_CELL_SIZE);
     }
 
     // 添加状态提示

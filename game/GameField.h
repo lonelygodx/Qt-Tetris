@@ -3,6 +3,7 @@
 #include <QVector>
 #include <QColor>
 #include <QRect>
+#include "GameConfig.h"
 
 class GameField
 {
@@ -14,7 +15,7 @@ public:
         Cell() : occupied(false), color(Qt::black) {}
     };
 
-    explicit GameField(int width = 10, int height = 20);
+    explicit GameField(int width = FIELD_WIDTH, int height = FIELD_HEIGHT);
 
     // 基本操作
     bool isCellEmpty(int x, int y) const;

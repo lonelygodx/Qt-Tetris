@@ -25,7 +25,7 @@ public:
     ~GameEngine();
 
     // 游戏控制
-    bool initialize(int width = 10, int height = 20);
+    bool initialize();
     void startGame();
     void pauseGame();
     void resumeGame();
@@ -57,10 +57,6 @@ public:
 
     // 幽灵方块相关
     Block getGhostBlock() const;
-
-    // 幽灵方块配置
-    void setGhostBlockEnabled(bool enabled) { m_ghostEnabled = enabled; }
-    bool isGhostBlockEnabled() const { return m_ghostEnabled; }
 
 signals:
     void gameStateChanged(GameEngine::GameState newState);
@@ -115,8 +111,6 @@ private:
 
     // 系统组件
     QScopedPointer<BlockFactory> m_blockFactory;
-
-    bool m_ghostEnabled{true}; // 是否显示幽灵方块
 };
 
 #endif // GAMEENGINE_H

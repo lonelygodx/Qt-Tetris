@@ -1,9 +1,9 @@
-#include "BlockFactory.h"
 #include <qdebug.h>
+#include "BlockFactory.h"
+#include "GameConfig.h"
 
 BlockFactory::BlockFactory(QObject* parent)
     : QObject(parent)
-    , m_randomizerType("7-bag")
     , m_randomEngine(std::random_device{}())
 {
     initializeStandardBlocks();
@@ -130,7 +130,7 @@ Block BlockFactory::createRandomBlock()
 {
     Block::BlockType type;
 
-    if (m_randomizerType == "7-bag") {
+    if (RANDOMIZER_TYPE == "7-bag") {
         type = getNextFrom7Bag();
     }
     else {

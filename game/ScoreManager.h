@@ -41,7 +41,6 @@ public:
 private:
     QVector<HighScore> m_highScores;
     QSqlDatabase m_database;
-    static const int MAX_HIGH_SCORES = 5;
 
     bool createTable();
 };

@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include <QApplication>
 #include <QFile>
+#include "GameConfig.h"
 
 bool checkResourceAvailability()
 {
@@ -30,7 +31,17 @@ int main(int argc, char* argv[])
     QApplication::setApplicationVersion("1.0");
     QApplication::setOrganizationName("liguowei");
 
-    // 检查资源
+    // 加载配置文件
+    if (!GAME_CONFIG.initialize("./configData/user_config.ini"))
+    {
+        qWarning() << "配置文件加载失败！但继续运行...";
+    }
+    else
+    {
+        qDebug() << "配置文件加载成功！游戏版本：" << GAME_VERSION;
+    }
+
+    // 检查图标资源
     if (!checkResourceAvailability()) {
         qWarning() << "图标资源检查失败，但继续运行...";
     }

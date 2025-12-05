@@ -73,9 +73,16 @@ private:
     QLabel* m_scoreLabel;
     QLabel* m_levelLabel;
     QLabel* m_linesLabel;
+    QLabel* m_holdLabel;
+    QLabel* m_nextLabel;
+    QLabel* m_controlsLabel;
+    QLabel* m_controlsText;
     QPushButton* m_startButton;
-    QPushButton* m_pauseButton;
     QPushButton* m_highScoresButton;
+    QPushButton* m_helpButton;
+    QPushButton* m_quitButton;
+    QPushButton* m_pauseButton;
+    QPushButton* m_menuButton;
 
     // 预览组件
     NextBlockWidget* m_nextBlockWidget;
@@ -85,9 +92,13 @@ private:
 
     // 布局相关成员
     QWidget* m_gameScreen;           // 游戏界面主窗口
+    QWidget* m_gameArea;             // 游戏区域
+    QWidget* m_infoPanel;            // 信息面板
+    QVBoxLayout* m_menuLayout;       // 菜单界面布局（垂直）
     QHBoxLayout* m_mainGameLayout;   // 主游戏布局（水平）
     QVBoxLayout* m_gameAreaLayout;   // 游戏区域布局（垂直）
     QVBoxLayout* m_infoPanelLayout;  // 信息面板布局（垂直）
+    QVBoxLayout* m_pauseLayout;      // 暂停界面布局（垂直）
 };
 
 #endif // MAINWINDOW_H

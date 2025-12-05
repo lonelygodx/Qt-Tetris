@@ -7,6 +7,7 @@
 #include <QDir>
 #include <algorithm>
 #include <QCoreApplication>
+#include "GameConfig.h"
 
 ScoreManager::ScoreManager(QObject* parent)
     : QObject(parent)

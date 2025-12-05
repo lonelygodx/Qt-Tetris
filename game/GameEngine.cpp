@@ -1,11 +1,12 @@
-#include "GameEngine.h"
 #include <QDebug>
 #include <QDateTime>
+#include "GameEngine.h"
+#include "GameConfig.h"
 
 GameEngine::GameEngine(QObject* parent)
     : QObject(parent)
     , m_gameState(STATE_STOPPED)
-    , m_canHold(true)
+    , m_canHold(BLOCK_CANHOLD)
     , m_fallProgress(0.0f)
     , m_fastDrop(false)
     , m_fallSpeed(1000)
@@ -18,7 +19,6 @@ GameEngine::GameEngine(QObject* parent)
     // 创建游戏计时器
     m_gameTimer = new QTimer(this);
     connect(m_gameTimer, &QTimer::timeout, this, &GameEngine::updateGame);
-    m_gameTimer->setInterval(16); // 约60FPS
 }
 
 GameEngine::~GameEngine()
@@ -28,9 +28,10 @@ GameEngine::~GameEngine()
     }
 }
 
-bool GameEngine::initialize(int width, int height)
+bool GameEngine::initialize()
 {
-    m_gameField = GameField(width, height);
+    m_gameField = GameField(FIELD_WIDTH, FIELD_HEIGHT);
+    m_gameTimer->setInterval(GAME_TIMER_INTERVAL); // 默认16约60FPS
     resetGameStats();
 
     // 初始化Hold方块为一个有效的空方块
@@ -54,7 +55,7 @@ void GameEngine::startGame()
 
     resetGameStats();
     m_gameField.clearField();
-    m_canHold = true;
+    m_canHold = BLOCK_CANHOLD;
     m_fallProgress = 0.0f;
     m_fallSpeed = 1000;
     m_fastDrop = false;
@@ -253,7 +254,7 @@ void GameEngine::holdBlock()
 
     // 验证hold状态
     if (!m_canHold) {
-        qDebug() << "Cannot hold: already used hold in this turn";
+        qDebug() << "Cannot hold: already used hold in this turn or not allow hold";
         return;
     }
 
@@ -361,7 +362,7 @@ void GameEngine::spawnNewBlock()
         return;
     }
 
-    m_canHold = true;
+    m_canHold = BLOCK_CANHOLD;
     m_fallProgress = 0.0f;
     m_fastDrop = false;
 
